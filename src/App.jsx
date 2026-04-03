@@ -174,7 +174,7 @@ export default function App() {
         <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
           <div style={{ padding: "0 20px 22px" }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: "var(--c-heading)", letterSpacing: "-0.01em" }}>💰 FinanceOS</div>
-            <div style={{ fontSize: 13, color: "var(--c-dim)", marginTop: 3 }}>Personal Finance Manager</div>
+            <div style={{ fontSize: 13, color: "var(--c-secondary)", fontWeight: 500, marginTop: 3 }}>Personal Finance Manager</div>
           </div>
           <nav style={{ flex: 1, overflowY: "auto" }}>
             {NAV_ITEMS.map(item => {
@@ -216,7 +216,7 @@ export default function App() {
           <div style={{ padding: "20px 28px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)", marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }} className="desktop-header">
             <div>
               <h1 style={{ fontSize: 24, fontWeight: 700, color: "var(--c-heading)", letterSpacing: "-0.02em" }}>{currentNav?.label}</h1>
-              <p style={{ fontSize: 13, color: "var(--c-dim)", marginTop: 4 }}>ข้อมูลจาก Google Sheets · Real-time</p>
+              <p style={{ fontSize: 13, color: "var(--c-secondary)", fontWeight: 500, marginTop: 4 }}>ข้อมูลจาก Google Sheets · Real-time</p>
             </div>
             <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "6px 14px", fontSize: 12, color: "#10b981", fontWeight: 600 }}>Live</div>
           </div>
