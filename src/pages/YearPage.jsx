@@ -80,8 +80,8 @@ export default function YearPage() {
         <>
           <Section title={`${year} · สรุปรายปี`}>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-              <KpiCard label="รายรับสุทธิรวม" value={fmt(totalIncome)} accent="#10b981" sub={`${filled.length} เดือน (ถึงปัจจุบัน)`} />
-              <KpiCard label="รายจ่ายรวม" value={fmt(totalExpenses)} accent="#f43f5e" />
+              <KpiCard label="รายรับสุทธิรวม" value={fmt(totalIncome)} accent="var(--color-income)" sub={`${filled.length} เดือน (ถึงปัจจุบัน)`} />
+              <KpiCard label="รายจ่ายรวม" value={fmt(totalExpenses)} accent="var(--color-expense)" />
               <KpiCard label="เงินออมรวม" value={fmt(totalBalance)} accent="#60a5fa" sub={`เฉลี่ย ${fmt(Math.round(totalBalance / Math.max(filled.length, 1)))}/เดือน`} />
             </div>
           </Section>
@@ -93,12 +93,12 @@ export default function YearPage() {
                   <XAxis dataKey="name" tick={{ fill: "var(--c-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: "var(--c-muted)", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="income" name="รายรับ" fill="#10b981" radius={[4,4,0,0]} />
-                  <Bar dataKey="expense" name="รายจ่าย" fill="#f43f5e" radius={[4,4,0,0]} />
+                  <Bar dataKey="income" name="รายรับ" fill="var(--color-income)" radius={[4,4,0,0]} />
+                  <Bar dataKey="expense" name="รายจ่าย" fill="var(--color-expense)" radius={[4,4,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
               <div style={{ display: "flex", gap: 18, marginTop: 8 }}>
-                {[["#10b981","รายรับ"],["#f43f5e","รายจ่าย"]].map(([c,l]) => (
+                {[["var(--color-income)","รายรับ"],["var(--color-expense)","รายจ่าย"]].map(([c,l]) => (
                   <span key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "var(--c-secondary)" }}>
                     <span style={{ width: 8, height: 8, borderRadius: 2, background: c }} />{l}
                   </span>
@@ -117,9 +117,9 @@ export default function YearPage() {
                 return (
                   <div key={m.payMonth} style={{ display: "grid", gridTemplateColumns: "72px 1fr 1fr 1fr", padding: "12px 18px", borderBottom: i < filteredData.length - 1 ? "1px solid var(--border-subtle)" : "none", alignItems: "center", opacity: empty ? 0.3 : 1 }}>
                     <span style={{ fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>{MON[m.payMonth.split("-")[1]]}</span>
-                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, color: "#10b981" }}>{empty ? "—" : fmt(m.netIncome)}</span>
-                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, color: "#f87171" }}>{empty ? "—" : fmt(m.totalExpenses)}</span>
-                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 700, color: m.netBalance >= 0 ? "#60a5fa" : "#f43f5e" }}>{empty ? "—" : fmt(m.netBalance)}</span>
+                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, color: "var(--color-income)" }}>{empty ? "—" : fmt(m.netIncome)}</span>
+                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, color: "var(--color-expense)" }}>{empty ? "—" : fmt(m.totalExpenses)}</span>
+                    <span style={{ textAlign: "right", fontFamily: "'DM Mono', monospace", fontSize: 12, fontWeight: 700, color: m.netBalance >= 0 ? "#60a5fa" : "var(--color-expense)" }}>{empty ? "—" : fmt(m.netBalance)}</span>
                   </div>
                 );
               })}

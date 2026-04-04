@@ -117,7 +117,7 @@ function ExpensesTab() {
                   ))}
                   <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 18px", borderTop: "1px solid var(--border-card)" }}>
                     <span style={{ fontSize: 11, color: "var(--c-muted)", fontWeight: 600 }}>รวม</span>
-                    <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 700, color: "#f43f5e" }}>{fmt(total)}</span>
+                      <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 700, color: "var(--color-expense)" }}>{fmt(total)}</span>
                   </div>
                 </>
               )}

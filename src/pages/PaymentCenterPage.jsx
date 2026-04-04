@@ -50,15 +50,15 @@ export default function PaymentCenterPage() {
       <Section title="Due This Month">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
           <KpiCard label="รายการทั้งหมด" value={`${items.length} รายการ`} accent="#60a5fa" />
-          <KpiCard label="ยอดรวมที่ต้องจ่าย" value={fmt(totalDue)} accent="#f43f5e" />
-          <KpiCard label="ชำระแล้วเดือนนี้" value={`${paidCount} รายการ`} accent="#10b981" />
+          <KpiCard label="ยอดรวมที่ต้องจ่าย" value={fmt(totalDue)} accent="var(--color-expense)" />
+          <KpiCard label="ชำระแล้วเดือนนี้" value={`${paidCount} รายการ`} accent="var(--color-income)" />
         </div>
       </Section>
       <Section title="Payment Queue">
         {loading ? <Loading /> : (
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
             {err && <ErrMsg msg={err} />}
-            {items.length === 0 && <Card style={{ padding: "32px", textAlign: "center" }}><div style={{ fontSize: 22, marginBottom: 8 }}>✓</div><div style={{ color: "#10b981", fontWeight: 600, fontSize: 14 }}>ชำระครบทุกรายการแล้ว!</div></Card>}
+            {items.length === 0 && <Card style={{ padding: "32px", textAlign: "center" }}><div style={{ fontSize: 22, marginBottom: 8 }}>✓</div><div style={{ color: "var(--color-income)", fontWeight: 600, fontSize: 14 }}>ชำระครบทุกรายการแล้ว!</div></Card>}
             {items.map(item => {
               const diff = item.due_date ? Math.ceil((new Date(item.due_date) - today) / 86400000) : null;
               const urgent = diff !== null && diff <= 7;
@@ -76,7 +76,7 @@ export default function PaymentCenterPage() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 7 }}>
                     <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 700, fontSize: 14, color: urgent ? "#f87171" : "var(--c-heading)" }}>{fmt(item.amount)}</span>
-                    <Btn onClick={() => handlePay(item)} color="#10b981" small disabled={processingId === key}>{processingId === key ? "กำลังชำระ..." : "ชำระ"}</Btn>
+                    <Btn onClick={() => handlePay(item)} color="var(--color-income)" small disabled={processingId === key}>{processingId === key ? "กำลังชำระ..." : "ชำระ"}</Btn>
                   </div>
                 </Card>
               );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MONTHS } from "../../utils/dateUtils";
+import { uiTokens } from "../../styles/tokens";
 
 export function MonthPicker({ value, onChange }) {
   const [open, setOpen] = useState(false);
@@ -9,7 +10,7 @@ export function MonthPicker({ value, onChange }) {
   
   return (
     <div style={{ position: "relative", userSelect: "none" }}>
-      <button onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--bg-input)", border: "1px solid var(--border-input)", borderRadius: 10, padding: "8px 14px", color: "var(--c-text)", fontSize: 13, cursor: "pointer", fontFamily: "inherit", fontWeight: 500, minWidth: 150, justifyContent: "space-between" }}>
+      <button onClick={() => setOpen(o => !o)} style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--bg-input)", border: "1px solid var(--border-input)", borderRadius: uiTokens.radius.md, padding: "8px 14px", color: "var(--c-text)", fontSize: uiTokens.fontSize.md, cursor: "pointer", fontFamily: uiTokens.fontFamilyBase, fontWeight: 500, minWidth: 150, justifyContent: "space-between" }}>
         <span>{MONTHS[activeMonth]} {year}</span>
         <span style={{ fontSize: 10, color: "var(--c-muted)", transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
       </button>
@@ -23,11 +24,11 @@ export function MonthPicker({ value, onChange }) {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
             {MONTHS.map((m, i) => {
               const isCurrent = year === Number(value.split("-")[0]) && i === activeMonth;
-              return <button key={m} onClick={() => select(i)} style={{ padding: "7px 0", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontWeight: isCurrent ? 700 : 400, fontFamily: "inherit", background: isCurrent ? "#10b981" : "var(--border-subtle)", color: isCurrent ? "#fff" : "var(--c-secondary)", transition: "all 0.1s" }}>{m}</button>;
+              return <button key={m} onClick={() => select(i)} style={{ padding: "7px 0", borderRadius: uiTokens.radius.sm, border: "none", cursor: "pointer", fontSize: uiTokens.fontSize.sm, fontWeight: isCurrent ? 700 : 400, fontFamily: uiTokens.fontFamilyBase, background: isCurrent ? "var(--color-income)" : "var(--border-subtle)", color: isCurrent ? "#fff" : "var(--c-secondary)", transition: "all 0.1s" }}>{m}</button>;
             })}
           </div>
           <div style={{ marginTop: 12, textAlign: "right" }}>
-            <button onClick={() => { const n = new Date(); setYear(n.getFullYear()); select(n.getMonth()); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>เดือนนี้</button>
+            <button onClick={() => { const n = new Date(); setYear(n.getFullYear()); select(n.getMonth()); }} style={{ background: "none", border: "none", color: "var(--color-income)", fontSize: 11, cursor: "pointer", fontWeight: 600 }}>เดือนนี้</button>
           </div>
         </div>
       )}

@@ -12,6 +12,7 @@ import { MonthPicker } from "../components/form/MonthPicker";
 import { PayModal } from "../components/shared/PayModal";
 import { Loading } from "../components/shared/Loading";
 import { ErrMsg } from "../components/shared/ErrMsg";
+import { uiTokens } from "../styles/tokens";
 
 /* ──────────────────────────────────────────────────────────────────────────
    1. CUSTOM CONFIRM MODAL (สำหรับบัตรเครดิต และ บิลประจำ)
@@ -31,7 +32,7 @@ function ConfirmActionModal({ title, subtitle, amount, onConfirm, onClose, loadi
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
           <Btn onClick={onClose} color="#6b7280">ยกเลิก</Btn>
-          <Btn onClick={onConfirm} color="#10b981" disabled={loading}>{loading ? "กำลังชำระ..." : "ยืนยันชำระ"}</Btn>
+          <Btn onClick={onConfirm} color="var(--color-income)" disabled={loading}>{loading ? "กำลังชำระ..." : "ยืนยันชำระ"}</Btn>
         </div>
       </div>
     </div>
@@ -179,7 +180,7 @@ export default function DashboardPage() {
           <div style={{ width: 1, height: 24, background: "var(--border-card)" }} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 11, color: "var(--c-secondary)", fontWeight: 600 }}>Estimate Balance</div>
-            <div style={{ fontSize: 20, fontWeight: 800, color: estimatedBalance < 0 ? "#ef4444" : "#60a5fa", fontFamily: "'DM Mono'" }}>{mask(fmt(estimatedBalance))}</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: estimatedBalance < 0 ? "var(--color-expense)" : "#60a5fa", fontFamily: uiTokens.fontFamilyMono }}>{mask(fmt(estimatedBalance))}</div>
           </div>
         </div>
         <button onClick={() => setShowBalance(!showBalance)} style={{ border: "none", background: showBalance ? "rgba(16,185,129,0.15)" : "rgba(255,255,255,0.05)", padding: "10px 16px", borderRadius: 10, cursor: "pointer", color: showBalance ? "#10b981" : "var(--c-secondary)", fontSize: 13, fontWeight: 700 }}>{showBalance ? "👁️ แสดง" : "🙈 ซ่อน"}</button>
@@ -208,8 +209,8 @@ export default function DashboardPage() {
                 <span style={{ fontSize: 15, color: "#f87171", fontWeight: 700 }}>- {mask(fmt(s.deductions.totalDeduction))}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(16,185,129,0.08)", padding: "14px", borderRadius: 12, border: "1px solid rgba(16,185,129,0.1)" }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: "#10b981" }}>รายได้สุทธิ</span>
-                <span style={{ fontSize: 20, fontWeight: 800, color: "#10b981" }}>{mask(fmt(s.netIncome))}</span>
+                <span style={{ fontSize: 16, fontWeight: 800, color: "var(--color-income)" }}>รายได้สุทธิ</span>
+                <span style={{ fontSize: 20, fontWeight: 800, color: "var(--color-income)" }}>{mask(fmt(s.netIncome))}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", paddingLeft: 12, borderLeft: "3px solid #f59e0b" }}>
                 <span style={{ fontSize: 14, color: "var(--c-secondary)", fontWeight: 600 }}>รวมภาระคาดการณ์เดือนนี้</span>
@@ -218,9 +219,9 @@ export default function DashboardPage() {
               <div style={{ marginTop: 8, paddingTop: 16, borderTop: "1px solid var(--border-card)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                   <span style={{ fontSize: 14, fontWeight: 700 }}>Burn Rate</span>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: burnPct > 80 ? "#ef4444" : "#10b981" }}>{burnPct.toFixed(1)}%</span>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: burnPct > 80 ? "var(--color-expense)" : "var(--color-income)" }}>{burnPct.toFixed(1)}%</span>
                 </div>
-                <ProgressBar pct={burnPct} height={10} color={burnPct > 80 ? "#ef4444" : "#10b981"} />
+                <ProgressBar pct={burnPct} height={10} color={burnPct > 80 ? "var(--color-expense)" : "var(--color-income)"} />
               </div>
             </div>
           </Card>

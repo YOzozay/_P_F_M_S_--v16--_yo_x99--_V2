@@ -78,7 +78,7 @@ export default function DebtPage() {
       )}
       
       <Section title="ภาพรวมหนี้สิน (ไม่รวมงวดรถ/บ้าน)">
-        <KpiCard label="ยอดหนี้คงเหลือรวม" value={fmt(totalDebt)} accent="#f43f5e" sub={`${activeDebts.length} รายการ`} />
+        <KpiCard label="ยอดหนี้คงเหลือรวม" value={fmt(totalDebt)} accent="var(--color-expense)" sub={`${activeDebts.length} รายการ`} />
       </Section>
 
       <Section title="เพิ่มหนี้สินก้อนใหม่">
@@ -90,7 +90,7 @@ export default function DebtPage() {
             <FInput label="หมายเหตุ" value={form.note} onChange={v => f("note", v)} placeholder="Optional" />
           </div>
           <div style={{ marginTop: 14 }}>
-            <Btn onClick={handleAdd} color="#f43f5e" disabled={submitting}>{submitting ? "กำลังบันทึก..." : "+ เพิ่มหนี้สิน"}</Btn>
+            <Btn onClick={handleAdd} color="var(--color-expense)" disabled={submitting}>{submitting ? "กำลังบันทึก..." : "+ เพิ่มหนี้สิน"}</Btn>
           </div>
         </Card>
       </Section>
@@ -122,14 +122,14 @@ export default function DebtPage() {
                         <div style={{ fontFamily: "'DM Mono', monospace", fontWeight: 700, fontSize: 18, color: closed ? "var(--c-subtle)" : "#f87171" }}>{fmt(remaining)}</div>
                       </div>
                     </div>
-                    <ProgressBar pct={pct} color={closed ? "#10b981" : pct > 70 ? "#10b981" : pct > 40 ? "#f59e0b" : "#f43f5e"} />
+                    <ProgressBar pct={pct} color={closed ? "var(--color-income)" : pct > 70 ? "var(--color-income)" : pct > 40 ? "#f59e0b" : "var(--color-expense)"} />
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11 }}>
                       <span style={{ color: "var(--c-subtle)" }}>ชำระแล้ว {pct.toFixed(1)}% · {fmt(paid)}</span>
                       <span style={{ color: "var(--c-muted)" }}>รวม {fmt(totalAmt)}</span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 14 }}>
-                      <Btn onClick={() => handleDelete(d.id)} color="#f43f5e" small>ลบ</Btn>
-                      {!closed && <Btn onClick={() => { setPayErr(null); setPayModal({ ...d, monthly_due: 0 }); }} color="#f43f5e" small>💳 ชำระคืน</Btn>}
+                      <Btn onClick={() => handleDelete(d.id)} color="var(--color-expense)" small>ลบ</Btn>
+                      {!closed && <Btn onClick={() => { setPayErr(null); setPayModal({ ...d, monthly_due: 0 }); }} color="var(--color-expense)" small>💳 ชำระคืน</Btn>}
                     </div>
                   </Card>
                 );

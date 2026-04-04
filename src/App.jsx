@@ -75,6 +75,19 @@ export default function App() {
 
         /* ── Dark Theme (Original) ── */
         .app-root {
+          --font-family-base: 'Prompt', sans-serif;
+          --font-family-mono: 'DM Mono', monospace;
+          --font-size-xs: 0.625rem;
+          --font-size-sm: 0.75rem;
+          --font-size-md: 0.8125rem;
+          --font-size-lg: 0.875rem;
+          --font-size-xl: 1rem;
+          --radius-sm: 0.5rem;
+          --radius-md: 0.625rem;
+          --radius-lg: 0.75rem;
+          --radius-xl: 1rem;
+          --color-income: #10b981;
+          --color-expense: #f43f5e;
           --bg-page:    #060d1a;
           --bg-sidebar: #060d1a;
           --bg-card:    rgba(255,255,255,0.03);
@@ -167,7 +180,7 @@ export default function App() {
         }
       `}</style>
 
-      <div className={`app-root${isDark ? "" : " light"}`} style={{ display: "flex", height: "100%", width: "100%", background: "var(--bg-page)", color: "var(--c-text)", fontFamily: "'Prompt', sans-serif" }}>
+      <div className={`app-root${isDark ? "" : " light"}`} style={{ display: "flex", height: "100%", width: "100%", background: "var(--bg-page)", color: "var(--c-text)", fontFamily: "var(--font-family-base)" }}>
         <div className={`sidebar-overlay ${sidebarOpen ? "open" : ""}`} onClick={() => setSidebarOpen(false)} />
 
         {/* ── Sidebar ── */}
