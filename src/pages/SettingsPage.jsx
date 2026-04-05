@@ -80,7 +80,8 @@ export default function SettingsPage() {
     fuel_per_day: "ค่าน้ำมัน/วัน",
     social_security_max_base: "ฐานประกันสังคม (สูงสุด)",
     social_security_rate: "อัตราประกันสังคม",
-    student_loan_fixed: "กยศ. หักคงที่/เดือน"
+    student_loan_fixed: "กยศ. หักคงที่/เดือน",
+    diligence_allowance: "เบี้ยขยัน/เดือน"
   };
 
   return (

@@ -76,7 +76,7 @@ export function PayModal({ loan, onClose, onConfirm, loading, err }) {
         {err && <ErrMsg msg={err} />}
         
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <Btn onClick={onClose} color="var(--c-muted)">ยกเลิก</Btn>
+          <Btn onClick={onClose} color="#ed5c5c">ยกเลิก</Btn>
           <Btn onClick={handleConfirm} color={isHome ? "#a78bfa" : "#10b981"} disabled={loading}>
             {loading ? "กำลังชำระ..." : "ยืนยันชำระ"}
           </Btn>

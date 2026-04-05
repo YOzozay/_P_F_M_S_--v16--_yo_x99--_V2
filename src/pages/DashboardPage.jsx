@@ -31,8 +31,8 @@ function ConfirmActionModal({ title, subtitle, amount, onConfirm, onClose, loadi
           <div style={{ fontSize: 24, fontWeight: 700, color: "var(--c-heading)", fontFamily: "'DM Mono'" }}>{fmt(amount)}</div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <Btn onClick={onClose} color="#6b7280">ยกเลิก</Btn>
-          <Btn onClick={onConfirm} color="var(--color-income)" disabled={loading}>{loading ? "กำลังชำระ..." : "ยืนยันชำระ"}</Btn>
+          <Btn onClick={onClose} color="#ed5c5c">ยกเลิก</Btn>
+          <Btn onClick={onConfirm} color="#10b981" disabled={loading}>{loading ? "กำลังชำระ..." : "ยืนยันชำระ"}</Btn>
         </div>
       </div>
     </div>
@@ -50,14 +50,23 @@ export default function DashboardPage() {
   const [loading, setLoading]       = useState(true);
   const [err, setErr]               = useState(null);
   const [showBalance, setShowBalance] = useState(false);
-  
+
+  // ── Track ว่างวดไหนจ่ายแล้วในเดือนนี้ (key = `${payMonth}__${id}`)
+  const [paidLoanKeys,   setPaidLoanKeys]   = useState(new Set());
+  const [paidCreditKeys, setPaidCreditKeys] = useState(new Set());
+
   const [loanPayModal, setLoanPayModal] = useState(null);
   const [creditPayConfirm, setCreditPayConfirm] = useState(null);
   const [fixedPayConfirm, setFixedPayConfirm] = useState(null);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-  
+
   const mask = (val) => (showBalance ? val : "****");
+
+  // helper: key ที่ใช้ระบุ "จ่ายแล้วรอบเดือนนี้"
+  const loanPaidKey   = (id) => `${payMonth}__${id}`;
+  const isLoanPaid    = (id) => paidLoanKeys.has(loanPaidKey(id));
+  const isCreditPaid  = (id) => paidCreditKeys.has(`${payMonth}__${id}`);
 
   const loadDashboard = useCallback(() => {
     setLoading(true); setErr(null);
@@ -80,9 +89,16 @@ export default function DashboardPage() {
     if (!loanPayModal) return;
     setActionLoading(true);
     try {
-      const data = typeof payload === "object" ? { action: "payLoan", loan_id: loanPayModal.id, loan_type: loanPayModal._type, ...payload } : { action: "payLoan", loan_id: loanPayModal.id, loan_type: loanPayModal._type, amount: payload };
+      const data = typeof payload === "object"
+        ? { action: "payLoan", loan_id: loanPayModal.id, loan_type: loanPayModal._type, ...payload }
+        : { action: "payLoan", loan_id: loanPayModal.id, loan_type: loanPayModal._type, amount: payload };
       await apiPost(data);
-      setLoanPayModal(null); loadDashboard();
+
+      // ── Mark ว่างวดนี้จ่ายแล้วสำหรับเดือน payMonth
+      setPaidLoanKeys(prev => new Set([...prev, loanPaidKey(loanPayModal.id)]));
+
+      setLoanPayModal(null);
+      loadDashboard();
     } catch { alert("ชำระไม่สำเร็จ"); } finally { setActionLoading(false); }
   };
 
@@ -91,6 +107,12 @@ export default function DashboardPage() {
     setActionLoading(true);
     try {
       await apiPost({ action: "payCreditInstallment", installment_id: creditPayConfirm.id });
+
+      // ── Mark ว่า group นี้จ่ายแล้วรอบเดือน payMonth
+      if (creditPayConfirm._groupId) {
+        setPaidCreditKeys(prev => new Set([...prev, `${payMonth}__${creditPayConfirm._groupId}`]));
+      }
+
       setCreditPayConfirm(null); loadDashboard();
     } catch { alert("ชำระไม่สำเร็จ"); } finally { setActionLoading(false); }
   };
@@ -131,14 +153,24 @@ export default function DashboardPage() {
     ...loans.home.map(l => ({ ...l, _type: "home_loan", _color: "#a78bfa", _label: "บ้าน" }))
   ].filter(l => l.status !== "closed");
 
-  const totalVariable = s.expenses.variable.total || 0;
-  const totalFixed = s.expenses.fixed.total || 0;
-  const totalLoanDues = activeLoans.reduce((acc, curr) => acc + (Number(curr.monthly_due) || 0), 0);
-  const totalCreditDues = listToShowOnDashboard.reduce((acc, curr) => acc + curr.totalInCycle, 0);
+  const totalVariable   = s.expenses.variable.total || 0;
+  const totalFixed      = s.expenses.fixed.total || 0;
+
+  // ── คำนวณเฉพาะงวดที่ยังไม่ได้จ่ายในเดือนนี้
+  const totalLoanDues   = activeLoans
+    .filter(l => !isLoanPaid(l.id))
+    .reduce((acc, curr) => acc + (Number(curr.monthly_due) || 0), 0);
+
+  // ── คำนวณเฉพาะ group ที่ยังไม่ได้จ่ายในเดือนนี้
+  const totalCreditDues = listToShowOnDashboard
+    .filter(g => !isCreditPaid(g.id))
+    .reduce((acc, curr) => acc + curr.totalInCycle, 0);
 
   const totalProjectedExpenses = totalVariable + totalFixed + totalLoanDues + totalCreditDues;
-  const estimatedBalance = s.netIncome - totalProjectedExpenses;
-  const burnPct = s.netIncome > 0 ? (totalProjectedExpenses / s.netIncome) * 100 : 0;
+  const estimatedBalance       = s.netIncome - totalProjectedExpenses;
+
+  // burnPct ยังคำนวณไว้ แต่ไม่แสดง UI (ไม่กระทบฟังก์ชันอื่น)
+  const burnPct = s.netIncome > 0 ? (totalProjectedExpenses / s.netIncome) * 100 : 0; // eslint-disable-line no-unused-vars
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingBottom: 40 }}>
@@ -188,7 +220,7 @@ export default function DashboardPage() {
 
       {/* ── MAIN CONTENT GRID ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 480px), 1fr))", gap: 16 }}>
-        
+
         {/* === COLUMN 1: FINANCIAL FLOW === */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
           <Card style={{ padding: 24 }}>
@@ -199,7 +231,6 @@ export default function DashboardPage() {
                   <span style={{ fontSize: 15, color: "var(--c-secondary)", fontWeight: 700 }}>รายได้ (Gross)</span>
                   <span style={{ fontSize: 18, fontFamily: "'DM Mono'", fontWeight: 700 }}>{mask(fmt(s.income.grossIncome))}</span>
                 </div>
-                {/* ✅ ตัวหนังสือเข้มขึ้น (Secondary Color + Weight 600) */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>
                   <span>เงินเดือน: {mask(fmt(s.income.monthlySalary))}</span> | <span>OT: {mask(fmt(s.income.otPay))}</span> | <span>ข้าว+น้ำมัน: {mask(fmt(s.income.mealNormal + s.income.mealOt + s.income.fuel))}</span> | <span>เบี้ยขยัน: {mask(fmt(s.income.diligenceAllowance || 0))}</span>
                 </div>
@@ -216,13 +247,27 @@ export default function DashboardPage() {
                 <span style={{ fontSize: 14, color: "var(--c-secondary)", fontWeight: 600 }}>รวมภาระคาดการณ์เดือนนี้</span>
                 <span style={{ fontSize: 15, color: "#f59e0b", fontWeight: 700 }}>- {mask(fmt(totalProjectedExpenses))}</span>
               </div>
-              <div style={{ marginTop: 8, paddingTop: 16, borderTop: "1px solid var(--border-card)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700 }}>Burn Rate</span>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: burnPct > 80 ? "var(--color-expense)" : "var(--color-income)" }}>{burnPct.toFixed(1)}%</span>
-                </div>
-                <ProgressBar pct={burnPct} height={10} color={burnPct > 80 ? "var(--color-expense)" : "var(--color-income)"} />
+
+              {/* ── คงเหลือ / ต้องหาเพิ่ม ── */}
+              <div style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                paddingLeft: 12,
+                borderLeft: `3px solid ${estimatedBalance < 0 ? "#ef4444" : "#60a5fa"}`,
+              }}>
+                <span style={{ fontSize: 14, color: "var(--c-secondary)", fontWeight: 600 }}>
+                  {estimatedBalance < 0 ? "⚠️ ต้องหาเพิ่ม" : "✅ คงเหลือ"}
+                </span>
+                <span style={{
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: estimatedBalance < 0 ? "#ef4444" : "#60a5fa",
+                  fontFamily: "'DM Mono'",
+                }}>
+                  {mask(fmt(Math.abs(estimatedBalance)))}
+                </span>
               </div>
+              {/* ── /คงเหลือ / ต้องหาเพิ่ม ── */}
+
             </div>
           </Card>
 
@@ -247,17 +292,31 @@ export default function DashboardPage() {
             <div style={{ padding: "0 20px" }}>
               {activeLoans.map(loan => {
                 const inst = calcLoanInstallment(loan);
-                const pct = ((Number(loan.total_amount) - Number(loan.remaining_amount)) / Number(loan.total_amount)) * 100;
+                const pct  = ((Number(loan.total_amount) - Number(loan.remaining_amount)) / Number(loan.total_amount)) * 100;
+                const paid = isLoanPaid(loan.id);
                 return (
                   <div key={loan.id} style={{ padding: "18px 0", borderBottom: "1px solid var(--border-subtle)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                       <div style={{ fontWeight: 700, fontSize: 15 }}>{loan.name} <Badge text={loan._label} color={loan._color} /></div>
-                      <div style={{ fontWeight: 800, color: "#f87171", fontSize: 17 }}>{fmt(loan.monthly_due)}</div>
+                      <div style={{ fontWeight: 800, color: paid ? "var(--c-muted)" : "#f87171", fontSize: 17, textDecoration: paid ? "line-through" : "none" }}>
+                        {fmt(loan.monthly_due)}
+                      </div>
                     </div>
                     <ProgressBar pct={pct} color={loan._color} height={8} />
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, alignItems: "center" }}>
                       <span style={{ fontSize: 13, color: "var(--c-secondary)", fontWeight: 600 }}>งวดที่ {inst?.paid}/{inst?.total}</span>
-                      <Btn onClick={() => setLoanPayModal({ ...loan, _type: loan._type })} color={loan._color} small>💳 จ่าย</Btn>
+                      {paid ? (
+                        /* ── สถานะ "จ่ายแล้ว" เดือนนี้ ── */
+                        <span style={{
+                          fontSize: 12, fontWeight: 700,
+                          color: "#10b981",
+                          background: "rgba(16,185,129,0.12)",
+                          border: "1px solid rgba(16,185,129,0.3)",
+                          borderRadius: 8, padding: "5px 12px",
+                        }}>✅ จ่ายแล้ว</span>
+                      ) : (
+                        <Btn onClick={() => setLoanPayModal({ ...loan, _type: loan._type })} color={loan._color} small>💳 จ่าย</Btn>
+                      )}
                     </div>
                   </div>
                 );
@@ -267,21 +326,41 @@ export default function DashboardPage() {
 
           <Card style={{ padding: 0 }}>
             <div style={{ padding: "14px 20px", fontSize: 13, fontWeight: 700, color: "var(--c-secondary)", borderBottom: "1px solid var(--border-card)" }}>💳 บัตรเครดิต (รอบนี้)</div>
-            {listToShowOnDashboard.map((group, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: i < listToShowOnDashboard.length - 1 ? "1px solid var(--border-subtle)" : "none" }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "var(--c-heading)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{group.description}</div>
-                  <div style={{ fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>{group.card_name}</div>
-                </div>
-                <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: "#f59e0b", marginBottom: 6 }}>{fmt(group.totalInCycle)}</div>
-                  <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                    <button onClick={() => setSelectedGroupId(group.id)} style={{ border: "none", background: "none", color: "#60a5fa", fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>รายละเอียด</button>
-                    <Btn onClick={() => setCreditPayConfirm(group.currentMonthItem)} color="#f59e0b" small>💳 จ่าย</Btn>
+            {listToShowOnDashboard.map((group, i) => {
+              const creditPaid = isCreditPaid(group.id);
+              return (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: i < listToShowOnDashboard.length - 1 ? "1px solid var(--border-subtle)" : "none" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "var(--c-heading)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{group.description}</div>
+                    <div style={{ fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>{group.card_name}</div>
+                  </div>
+                  <div style={{ textAlign: "right", flexShrink: 0 }}>
+                    <div style={{
+                      fontSize: 17, fontWeight: 800, marginBottom: 6,
+                      color: creditPaid ? "var(--c-muted)" : "#f59e0b",
+                      textDecoration: creditPaid ? "line-through" : "none",
+                    }}>{fmt(group.totalInCycle)}</div>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", alignItems: "center" }}>
+                      <button onClick={() => setSelectedGroupId(group.id)} style={{ border: "none", background: "none", color: "#60a5fa", fontSize: 12, fontWeight: 700, cursor: "pointer", padding: 0 }}>รายละเอียด</button>
+                      {creditPaid ? (
+                        <span style={{
+                          fontSize: 12, fontWeight: 700,
+                          color: "#10b981",
+                          background: "rgba(16,185,129,0.12)",
+                          border: "1px solid rgba(16,185,129,0.3)",
+                          borderRadius: 8, padding: "5px 12px",
+                        }}>✅ จ่ายแล้ว</span>
+                      ) : (
+                        <Btn
+                          onClick={() => setCreditPayConfirm({ ...group.currentMonthItem, _groupId: group.id })}
+                          color="#f59e0b" small
+                        >💳 จ่าย</Btn>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </Card>
         </div>
       </div>
