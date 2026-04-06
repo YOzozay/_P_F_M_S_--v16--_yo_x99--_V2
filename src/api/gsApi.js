@@ -1,5 +1,5 @@
 // ✅ ใส่ลิงก์ API ของคุณตรงนี้
-const API_URL = "https://script.google.com/macros/s/AKfycby_aw5TfO74GX_mhoOT3AaqtFEpmcCtsfDzQwtBIPlvP2mk8VFXV3JcjMy-TrotlA8H/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzjOQlzfmVZbthdOlZE2jgQsgWREOoLisJAxUDSzy0YaXRupqKih6r6v6CFncRVjplD/exec";
 
 // 📦 ตัวแปรเก็บข้อมูลชั่วคราว (Cache)
 let apiCache = {};
