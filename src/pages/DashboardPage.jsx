@@ -129,12 +129,15 @@ export default function DashboardPage() {
   if (loading) return <Loading />;
   if (err) return <ErrMsg msg={err} />;
 
+  const s = summary;
+  // const cycleStart = new Date(s.period.startDate);
+  // const cycleEnd   = new Date(s.period.endDate);
    const s = summary;
    const cycleStart = new Date(s.period.startDate);
    const cycleEnd   = new Date(s.period.endDate);
 // แก้แล้ว — ใช้ calendar month ของ payMonth แทน cycle window
    const [pmYear, pmMonth] = payMonth.split("-").map(Number); // เช่น 2026, 4
-   
+
    const groupedUpcoming = upcoming.reduce((acc, item) => {
      const key = item.transaction_id || `${item.card_name}_${item.description}`;
      if (!acc[key]) acc[key] = { id: key, card_name: item.card_name, description: item.description, items: [], totalInCycle: 0, currentMonthItem: null };
