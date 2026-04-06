@@ -139,13 +139,11 @@ export default function DashboardPage() {
      const key = item.transaction_id || `${item.card_name}_${item.description}`;
      if (!acc[key]) acc[key] = { id: key, card_name: item.card_name, description: item.description, items: [], totalInCycle: 0, currentMonthItem: null };
      acc[key].items.push(item);
-     const due = new Date(item.due_date);
-     // แสดงถ้า due date อยู่ใน calendar month เดียวกับ payMonth
-     // เช่น payMonth=2026-04 → แสดง due date ใดก็ได้ที่เป็นเดือน เม.ย. 2026
-     if (due.getFullYear() === pmYear && due.getMonth() + 1 === pmMonth) {
-       acc[key].totalInCycle += Number(item.amount);
-       acc[key].currentMonthItem = item;
-     }
+   const due = new Date(item.due_date);
+   if (due >= cycleStart && due <= cycleEnd) {   // ← due 25 เม.ย. ไม่ผ่าน condition นี้
+     acc[key].totalInCycle += Number(item.amount);  // ← เลยไม่ถูกบวก → totalInCycle = 0
+     acc[key].currentMonthItem = item;
+   }
      return acc;
    }, {});
 
