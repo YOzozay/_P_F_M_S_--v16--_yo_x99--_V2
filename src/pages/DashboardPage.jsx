@@ -14,11 +14,11 @@ import { Loading } from "../components/shared/Loading";
 import { ErrMsg } from "../components/shared/ErrMsg";
 import { uiTokens } from "../styles/tokens";
 
-/* ───────────────────────────────────────────────────────── */
+/* ───────── Confirm Modal ───────── */
 function ConfirmActionModal({ title, subtitle, amount, onConfirm, onClose, loading }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "var(--bg-picker)", borderRadius: 18, padding: "24px", width: "100%", maxWidth: 380 }}>
+      <div style={{ background: "var(--bg-picker)", borderRadius: 18, padding: 24, width: "100%", maxWidth: 380 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: 16, fontWeight: 700 }}>💳 ยืนยันการชำระ</div>
           <div style={{ fontSize: 13 }}>{title}</div>
@@ -38,7 +38,7 @@ function ConfirmActionModal({ title, subtitle, amount, onConfirm, onClose, loadi
     </div>
   );
 }
-/* ───────────────────────────────────────────────────────── */
+/* ─────────────────────────────── */
 
 export default function DashboardPage() {
   const [payMonth, setPayMonth] = useState(getPayMonth());
@@ -150,7 +150,7 @@ export default function DashboardPage() {
 
   const s = summary;
 
-  // ✅ FIX BUG ตรงนี้
+  // ✅ FIX BUG (สำคัญ)
   const cycleStart = new Date(s.period.startDate);
   const cycleEnd = new Date(s.period.endDate);
 
@@ -200,9 +200,24 @@ export default function DashboardPage() {
   const estimatedBalance = s.netIncome - totalProjectedExpenses;
 
   return (
-    <div style={{ padding: 20 }}>
-      {/* UI เดิมทั้งหมดคุณใช้ต่อได้เลย ไม่กระทบ */}
-      <h3>Estimate Balance: {mask(fmt(estimatedBalance))}</h3>
+    <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingBottom: 40 }}>
+      {/* HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <MonthPicker value={payMonth} onChange={setPayMonth} />
+        <div>
+          Estimate Balance: {mask(fmt(estimatedBalance))}
+        </div>
+      </div>
+
+      {/* CREDIT */}
+      <Card>
+        <div style={{ padding: 16, fontWeight: 700 }}>💳 บัตรเครดิต</div>
+        {listToShowOnDashboard.map((group, i) => (
+          <div key={i} style={{ padding: 12, borderTop: "1px solid #eee" }}>
+            {group.description} — {fmt(group.totalInCycle)}
+          </div>
+        ))}
+      </Card>
     </div>
   );
 }
