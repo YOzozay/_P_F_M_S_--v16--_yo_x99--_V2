@@ -130,15 +130,16 @@ export default function DashboardPage() {
   if (err) return <ErrMsg msg={err} />;
 
   const s = summary;
-  const cycleStart = new Date(s.period.startDate);
-  const cycleEnd   = new Date(s.period.endDate);
-
+  // const cycleStart = new Date(s.period.startDate);
+  // const cycleEnd   = new Date(s.period.endDate);
+  const [pmYear, pmMonth] = payMonth.split("-").map(Number);
+   
   const groupedUpcoming = upcoming.reduce((acc, item) => {
     const key = item.transaction_id || `${item.card_name}_${item.description}`;
     if (!acc[key]) acc[key] = { id: key, card_name: item.card_name, description: item.description, items: [], totalInCycle: 0, currentMonthItem: null };
     acc[key].items.push(item);
     const due = new Date(item.due_date);
-    if (due >= cycleStart && due <= cycleEnd) {
+    if (due.getFullYear() === pmYear && due.getMonth() + 1 === pmMonth) {
       acc[key].totalInCycle += Number(item.amount);
       acc[key].currentMonthItem = item;
     }
