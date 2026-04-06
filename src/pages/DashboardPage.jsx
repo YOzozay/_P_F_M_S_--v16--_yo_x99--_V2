@@ -10,6 +10,7 @@ import { Badge } from "../components/ui/Badge";
 import { Btn, XBtn } from "../components/ui/Btn";
 import { MonthPicker } from "../components/form/MonthPicker";
 import { PayModal } from "../components/shared/PayModal";
+import { ConfirmModal } from "../components/shared/ConfirmModal"; 
 import { Loading } from "../components/shared/Loading";
 import { ErrMsg } from "../components/shared/ErrMsg";
 import { uiTokens } from "../styles/tokens";
@@ -72,7 +73,7 @@ export default function DashboardPage() {
       const expArr = Array.isArray(expensesData) ? expensesData : [];
       setMonthExpenses(expArr);
 
-      // ✅ ซ่อนเฉพาะรถและบ้าน แต่ให้แสดง credit_payment (ตามรูปที่ต้องการ)
+      // ✅ ซ่อนเฉพาะรถและบ้าน แต่ให้แสดง credit_payment (เพื่อให้โชว์ฝั่งซ้ายตอนกดจ่ายแล้ว)
       const normalEx = expArr.filter((e) => !["car_payment", "home_payment", "debt_payment"].includes(e.category));
       setRecentExpenses(normalEx.slice(0, 5));
     }).catch((e) => setErr(e.message)).finally(() => setLoading(false));
@@ -207,7 +208,7 @@ export default function DashboardPage() {
                   <span style={{ fontSize: 15, color: "var(--c-secondary)", fontWeight: 700 }}>รายได้ (Gross)</span>
                   <span style={{ fontSize: 18, fontFamily: uiTokens.fontFamilyMono, fontWeight: 700 }}>{mask(fmt(s.income.grossIncome))}</span>
                 </div>
-                {/* ✅ เพิ่มเบี้ยขยันกลับมาแล้วครับ! */}
+                {/* ✅ เบี้ยขยันแสดงตามปกติ */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>
                   <span>เงินเดือน: {mask(fmt(s.income.monthlySalary))}</span> | 
                   <span>OT: {mask(fmt(s.income.otPay))}</span> | 
@@ -281,7 +282,6 @@ export default function DashboardPage() {
                 const inst = calcLoanInstallment(loan);
                 const pct = ((Number(loan.total_amount) - Number(loan.remaining_amount)) / Number(loan.total_amount)) * 100;
                 
-                // เช็คว่าจ่ายในรอบบิลนี้ไปหรือยัง จาก source_id
                 const isPaidThisMonth = monthExpenses.some(ex => ex.source_id === String(loan.id));
 
                 return (
@@ -329,10 +329,11 @@ export default function DashboardPage() {
                         งวดที่ {credit.installment_no}/{credit.months} <span style={{ fontSize: 11, marginLeft: 4 }}>(Due: {credit.due_date})</span>
                       </span>
                       
+                      {/* ✅ เปลี่ยนเป็น ⏳ รอจ่ายบิลหน้า ให้ตรงกับความจริงแล้วครับ! */}
                       {credit.isDueThisCycle ? (
                         <Btn onClick={() => setCreditPayConfirm(credit)} color="#f59e0b" small>💳 จ่าย</Btn>
                       ) : (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#10b981", background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: 8, padding: "5px 12px" }}>✅ จ่ายแล้วรอบนี้</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#8b5cf6", background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 8, padding: "5px 12px" }}>⏳ รอจ่ายบิลหน้า</span>
                       )}
                     </div>
                   </div>
