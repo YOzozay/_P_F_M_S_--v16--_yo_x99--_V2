@@ -72,8 +72,8 @@ export default function DashboardPage() {
       const expArr = Array.isArray(expensesData) ? expensesData : [];
       setMonthExpenses(expArr);
 
-      // กรองซ่อนหมวดหมู่เหล่านี้จากลิสต์ "รายการล่าสุด" 
-      const normalEx = expArr.filter((e) => !["car_payment", "home_payment", "credit_payment", "debt_payment"].includes(e.category));
+      // ✅ ซ่อนเฉพาะรถและบ้าน แต่ให้แสดง credit_payment (ตามรูปที่ต้องการ)
+      const normalEx = expArr.filter((e) => !["car_payment", "home_payment", "debt_payment"].includes(e.category));
       setRecentExpenses(normalEx.slice(0, 5));
     }).catch((e) => setErr(e.message)).finally(() => setLoading(false));
   }, [payMonth]);
@@ -207,8 +207,12 @@ export default function DashboardPage() {
                   <span style={{ fontSize: 15, color: "var(--c-secondary)", fontWeight: 700 }}>รายได้ (Gross)</span>
                   <span style={{ fontSize: 18, fontFamily: uiTokens.fontFamilyMono, fontWeight: 700 }}>{mask(fmt(s.income.grossIncome))}</span>
                 </div>
+                {/* ✅ เพิ่มเบี้ยขยันกลับมาแล้วครับ! */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", fontSize: 12, color: "var(--c-secondary)", fontWeight: 600 }}>
-                  <span>เงินเดือน: {mask(fmt(s.income.monthlySalary))}</span> | <span>OT: {mask(fmt(s.income.otPay))}</span> | <span>ข้าว+น้ำมัน: {mask(fmt(s.income.mealNormal + s.income.mealOt + s.income.fuel))}</span>
+                  <span>เงินเดือน: {mask(fmt(s.income.monthlySalary))}</span> | 
+                  <span>OT: {mask(fmt(s.income.otPay))}</span> | 
+                  <span>ข้าว+น้ำมัน: {mask(fmt(s.income.mealNormal + s.income.mealOt + s.income.fuel))}</span> | 
+                  <span>เบี้ยขยัน: {mask(fmt(s.income.diligenceAllowance || 0))}</span>
                 </div>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", paddingLeft: 12, borderLeft: "4px solid #ef4444" }}>
