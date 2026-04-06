@@ -132,19 +132,22 @@ export default function DashboardPage() {
   const s = summary;
   // const cycleStart = new Date(s.period.startDate);
   // const cycleEnd   = new Date(s.period.endDate);
-  const [pmYear, pmMonth] = payMonth.split("-").map(Number);
+// แก้แล้ว — ใช้ calendar month ของ payMonth แทน cycle window
+   const [pmYear, pmMonth] = payMonth.split("-").map(Number); // เช่น 2026, 4
    
-  const groupedUpcoming = upcoming.reduce((acc, item) => {
-    const key = item.transaction_id || `${item.card_name}_${item.description}`;
-    if (!acc[key]) acc[key] = { id: key, card_name: item.card_name, description: item.description, items: [], totalInCycle: 0, currentMonthItem: null };
-    acc[key].items.push(item);
-    const due = new Date(item.due_date);
-    if (due.getFullYear() === pmYear && due.getMonth() + 1 === pmMonth) {
-      acc[key].totalInCycle += Number(item.amount);
-      acc[key].currentMonthItem = item;
-    }
-    return acc;
-  }, {});
+   const groupedUpcoming = upcoming.reduce((acc, item) => {
+     const key = item.transaction_id || `${item.card_name}_${item.description}`;
+     if (!acc[key]) acc[key] = { id: key, card_name: item.card_name, description: item.description, items: [], totalInCycle: 0, currentMonthItem: null };
+     acc[key].items.push(item);
+     const due = new Date(item.due_date);
+     // แสดงถ้า due date อยู่ใน calendar month เดียวกับ payMonth
+     // เช่น payMonth=2026-04 → แสดง due date ใดก็ได้ที่เป็นเดือน เม.ย. 2026
+     if (due.getFullYear() === pmYear && due.getMonth() + 1 === pmMonth) {
+       acc[key].totalInCycle += Number(item.amount);
+       acc[key].currentMonthItem = item;
+     }
+     return acc;
+   }, {});
 
   const listToShowOnDashboard = Object.values(groupedUpcoming).filter(g => g.totalInCycle > 0);
   const activeGroup = selectedGroupId ? groupedUpcoming[selectedGroupId] : null;
